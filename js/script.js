@@ -64,3 +64,25 @@ window.onclick = (e) => {
     itemDetailModal.style.display = 'none';
   }
 };
+const itemlogin = document.querySelector('#wrap-detail');
+const loginButtons = document.querySelectorAll('#button-login');
+
+loginButtons.forEach((btn) => {
+  btn.onclick = (e) => {
+    itemlogin.style.display = 'flex';
+    e.preventDefault();
+  };
+});
+
+// klik tombol close modal
+document.querySelector('.modal-cont .close-icon').onclick = (e) => {
+  itemlogin.style.display = 'none';
+  e.preventDefault();
+};
+
+// klik di luar modal
+window.onclick = (e) => {
+  if (e.target === itemlogin) {
+    itemlogin.style.display = 'none';
+  }
+};
