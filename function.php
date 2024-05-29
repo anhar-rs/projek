@@ -1,100 +1,129 @@
-<?php 
+<?php
+
 // koneksi ke database
 $conn = mysqli_connect("localhost", "root", "", "phpdasar");
 
-
+// Fungsi untuk menjalankan query dan mengembalikan hasilnya
 if (!function_exists('query')) {
+    // Fungsi untuk menjalankan query dan mengembalikan hasilnya
     function query($query) {
         global $conn;
-
-        // Melakukan query ke database
         $result = mysqli_query($conn, $query);
-
-        // Mengecek apakah query berhasil
-        if (!$result) {
-            // Menangani error jika query gagal
-            die('Query Error: ' . mysqli_error($conn));
-        }
-
-        // Mengambil hasil query dan menyimpannya dalam array
         $rows = [];
         while ($row = mysqli_fetch_assoc($result)) {
             $rows[] = $row;
         }
-
         return $rows;
     }
 }
 
-
-// Cek dan deklarasikan fungsi login jika belum ada
-// Cek dan deklarasikan fungsi login jika belum ada
+// Fungsi untuk login
 if (!function_exists('login')) {
-    function login($data) {
+    function login() {
         global $conn;
 
-        $email = strtolower(stripslashes($data["email"]));
-        $password = mysqli_real_escape_string($conn, $data["password"]);
+        session_start(); // Mulai session
 
-        // cek email sudah ada atau belum
-        $result = mysqli_query($conn, "SELECT email FROM akun WHERE email = '$email'");
-
-        if (mysqli_fetch_assoc($result)) {
-            echo "<script>
-                    alert('Email sudah terdaftar!')
-                  </script>";
-            return false;
+        if (isset($_SESSION["login"])) {
+            header("Location: index.php");
+            exit;
         }
 
-        // enkripsi password
-        $password = password_hash($password, PASSWORD_DEFAULT);
+        if (isset($_COOKIE['id']) && isset($_COOKIE['key'])) {
+            $id = $_COOKIE['id'];
+            $key = $_COOKIE['key'];
 
-        // tambahkan user baru ke database
-        mysqli_query($conn, "INSERT INTO akun VALUES('', '$email', '$password')");
+            // Ambil username berdasarkan id
+            $result = mysqli_query($conn, "SELECT username FROM akun WHERE id = $id");
+            $row = mysqli_fetch_assoc($result);
 
-        return mysqli_affected_rows($conn);
+            // Cek cookie dan username
+            if ($key === hash('sha256', $row['username'])) {
+                $_SESSION['login'] = true;
+                header("Location: index.php");
+                exit;
+            }
+        }
+
+        if (isset($_POST["login"])) {
+            $username = $_POST["username"];
+            $password = $_POST["password"];
+
+            $result = mysqli_query($conn, "SELECT * FROM akun WHERE username = '$username'");
+
+            // Cek username
+            if (mysqli_num_rows($result) === 1) {
+                // Cek password
+                $row = mysqli_fetch_assoc($result);
+                if (password_verify($password, $row["password"])) {
+                    // Set session
+                    $_SESSION["login"] = true;
+
+                    // Cek remember me
+                    if (isset($_POST['remember'])) {
+                        // Buat cookie
+                        setcookie('id', $row['id'], time() + 60);
+                        setcookie('key', hash('sha256', $row['username']), time() + 60);
+                    }
+
+                    header("Location: index.php");
+                    exit;
+                }
+            }
+
+            $error = true;
+        }
     }
 }
-// Cek dan deklarasikan fungsi registrasi jika belum ada
+// Fungsi untuk registrasi
+if (!function_exists('login')) {
+    function login() {
+        // Konten fungsi login
+    }
+}
+
+// Fungsi untuk registrasi
+// Fungsi untuk registrasi
 if (!function_exists('registrasi')) {
     function registrasi($data) {
         global $conn;
 
-        $username = strtolower(stripslashes($data["email"]));
+        $username = strtolower(stripslashes($data["username"]));
         $password = mysqli_real_escape_string($conn, $data["password"]);
-        $password2 = mysqli_real_escape_string($conn, $data["password2"]);
-
-        // cek username sudah ada atau belum
-        $result = mysqli_query($conn, "SELECT username FROM akun WHERE email = '$username'");
-
-        if( mysqli_fetch_assoc($result) ) {
-            echo "<script>
-                    alert('username sudah terdaftar!')
-                  </script>";
+        
+        // Periksa apakah kunci "password2" ada dalam array $data
+        if (isset($data["password2"])) {
+            $password2 = mysqli_real_escape_string($conn, $data["password2"]);
+        } else {
+            // Jika kunci "password2" tidak ada, berikan pesan kesalahan
+            echo "<script>alert('Field konfirmasi password tidak ditemukan!');</script>";
             return false;
         }
 
-        // cek konfirmasi password
-        if( $password !== $password2 ) {
-            echo "<script>
-                    alert('konfirmasi password tidak sesuai!');
-                  </script>";
+        // Cek apakah username sudah ada
+        $result = mysqli_query($conn, "SELECT username FROM akun WHERE username = '$username'");
+        if (mysqli_num_rows($result) > 0) {
+            echo "<script>alert('Username sudah terdaftar!');</script>";
             return false;
         }
 
-        // enkripsi password
+        // Cek kesesuaian konfirmasi password
+        if ($password !== $password2) {
+            echo "<script>alert('Konfirmasi password tidak sesuai!');</script>";
+            return false;
+        }
+
+        // Enkripsi password
         $password = password_hash($password, PASSWORD_DEFAULT);
 
-        // tambahkan userbaru ke database
-        mysqli_query($conn, "INSERT INTO user VALUES('', '$username', '$password')");
-
-        return mysqli_affected_rows($conn);
+        // Tambahkan user baru ke database
+        $query = "INSERT INTO akun (username, password) VALUES ('$username', '$password')";
+        if (mysqli_query($conn, $query)) {
+            return true;
+        } else {
+            echo "Error: " . $query . "<br>" . mysqli_error($conn);
+            return false;
+        }
     }
 }
 ?>
-
-
-
-
-
-

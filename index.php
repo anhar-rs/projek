@@ -14,6 +14,7 @@ if (isset($_POST["login"])){
 <html lang="en">
 
 <head>
+
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,12 +25,16 @@ if (isset($_POST["login"])){
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,300;0,400;0,700;1,700&display=swap"
     rel="stylesheet">
+   
+   <script>src="src/app.js"</script>
 
   <!-- Feather Icons -->
   <script src="https://unpkg.com/feather-icons"></script>
 
   <!-- My Style -->
   <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/alpine.min.js" defer></script>
+
 </head>
 
 <body>
@@ -50,7 +55,7 @@ if (isset($_POST["login"])){
       <a href="#" id="search-button"><i data-feather="search"></i></a>
       <a href="#" id="shopping-cart-button"><i data-feather="shopping-cart"></i></a>
       <a href="#" id="hamburger-menu"><i data-feather="menu"></i></a>
-       <a href="#" id="button-login"><i data-feather="users"></i></a>
+      <a href="#" id="button-login"><i data-feather="users"></i></a>
     </div>
 
     <!-- Search Form start -->
@@ -165,21 +170,22 @@ if (isset($_POST["login"])){
   <!-- Menu Section end -->
 
   <!-- Products Section start -->
-  <section class="products" id="products">
+  <section class="products" id="products" x-data="products">
     <h2><span>Produk Unggulan</span> Kami</h2>
     <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo unde eum, ab fuga possimus iste.</p>
 
     <div class="row">
+      <template x-for="(item,index)in items" x-key="index">
       <div class="product-card">
         <div class="product-icons">
           <a href="#"><i data-feather="shopping-cart"></i></a>
           <a href="#" class="item-detail-button"><i data-feather="eye"></i></a>
         </div>
         <div class="product-image">
-          <img src="img/products/1.jpg" alt="Product 1">
+          <img :src="'img/products/${item.img}'" :alt="item.name">
         </div>
         <div class="product-content">
-          <h3>beras  1</h3>
+          <h3>x-text="item.name"</h3>
           <div class="product-stars">
             <i data-feather="star" class="star-full"></i>
             <i data-feather="star" class="star-full"></i>
@@ -187,30 +193,11 @@ if (isset($_POST["login"])){
             <i data-feather="star" class="star-full"></i>
             <i data-feather="star"></i>
           </div>
-          <div class="product-price">IDR 30K <span>IDR 55K</span></div>
+          <div class="product-price"><span x-text="item.price"></span></div>
         </div>
       </div>
-      <div class="product-card">
-        <div class="product-icons">
-          <a href="#"><i data-feather="shopping-cart"></i></a>
-          <a href="#" class="item-detail-button"><i data-feather="eye"></i></a>
-        </div>
-        <div class="product-image">
-          <img src="img/products/1.jpg" alt="Product 1">
-        </div>
-        <div class="product-content">
-          <h3>beras  1</h3>
-          <div class="product-stars">
-            <i data-feather="star"></i>
-            <i data-feather="star"></i>
-            <i data-feather="star"></i>
-            <i data-feather="star"></i>
-            <i data-feather="star"></i>
-          </div>
-          <div class="product-price">IDR 30K <span>IDR 55K</span></div>
-        </div>
-      </div>
-      <div class="product-card">
+      </template>
+     
         <div class="product-icons">
           <a href="#"><i data-feather="shopping-cart"></i></a>
           <a href="#" class="item-detail-button"><i data-feather="eye"></i></a>
@@ -248,11 +235,11 @@ if (isset($_POST["login"])){
       <form action="">
         <div class="input-group">
           <i data-feather="user"></i>
-          <input type="text" placeholder="nama   ">
+          <input type="text" placeholder="name   ">
         </div>
         <div class="input-group">
           <i data-feather="mail"></i>
-          <input type="text" placeholder="email">
+          <input type="text" placeholder="username">
         </div>
         <div class="input-group">
           <i data-feather="phone"></i>
@@ -330,9 +317,9 @@ if (isset($_POST["login"])){
         <div class="slider-tab"></div>
       </div>
       <div class="form-inner">
-        <form action="index.php" class="login" method="post">
+        <form action="login.php" class="login" method="post">
           <div class="field">
-            <input type="text" placeholder="Email Address" required name="email">
+            <input type="text" placeholder="username" required name="username">
           </div>
           <div class="field">
             <input type="password" placeholder="Password" required name="password">
@@ -348,15 +335,15 @@ if (isset($_POST["login"])){
             Don't Have Account? <a href="">Create A New</a>
           </div>
         </form>
-        <form action="index.php" class="signup" method="post">
+        <form action="registrasi.php" class="signup" method="post">
           <div class="field">
-            <input type="text" placeholder="Email Address" required name="email">
+            <input type="text" placeholder="username" required name="username">
           </div>
           <div class="field">
             <input type="password" placeholder="Password" required name="password">
           </div>
           <div class="field">
-            <input type="password" placeholder="Confirm Password" required name=" konfirpassword">
+            <input type="password" placeholder="Confirm Password" required name=" password2">
           </div>
           <div class="field btn">
             <div class="btn-layer"></div>
